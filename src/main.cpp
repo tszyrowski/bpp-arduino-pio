@@ -122,11 +122,7 @@ void loop() {
     blinkLED();
     updateXY(&accelX, &accelY);
     getMsg();
-    Serial.print(accelX);
-    Serial.print(' ');
-    Serial.print(accelY);
-    Serial.print(' ');
-    Serial.println(currMsg);
+    Serial.printf("%d %d %s\n", accelX, accelY, currMsg);
     updateDisplay(accelX, accelY);
-  } 
+  }
 }
