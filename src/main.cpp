@@ -11,7 +11,7 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 int accelX = 1;
 int accelY = 1;
 float x, y ,z;
-char currentReading[MSG_LEENGTH];  // array to store data line
+char currMsg[MSG_LEENGTH];  // array to store data line
 bool displayInitialised = false;
 
 // scheduler
@@ -47,17 +47,18 @@ void initialDisplay() {
 }
 
 void updateDisplay(int accelX, int accelY){
-    u8g2.setFont(u8g2_font_crox2hb_tr);
-    u8g2.setCursor(0, 12);
-    u8g2.print("X:");
-    u8g2.setCursor(75, 12);
-    u8g2.print("Y:");
-    u8g2.setFont(u8g2_font_fub11_tf);
-    u8g2.setCursor(0, 30);
-    u8g2.print(accelX);
-    u8g2.setCursor(75, 30);
-    u8g2.print(accelY);
-    u8g2.sendBuffer();
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_crox2hb_tr);
+  u8g2.setCursor(0, 12);
+  u8g2.print("X:");
+  u8g2.setCursor(75, 12);
+  u8g2.print("Y:");
+  u8g2.setFont(u8g2_font_fub11_tf);
+  u8g2.setCursor(0, 30);
+  u8g2.print(accelX);
+  u8g2.setCursor(75, 30);
+  u8g2.print(accelY);
+  u8g2.sendBuffer();
 }
 
 void blinkLED() {
@@ -87,6 +88,19 @@ void updateXY(int* new_x, int* new_y) {
   }
 }
 
+void getMsg() {
+  // Modify the messsge ti include time and most recent readings
+  unsigned long allSeconds=millis()/1000;
+  int runHours= allSeconds/3600;
+  int secsRemaining=allSeconds%3600;
+  int runMinutes=secsRemaining/60;
+  int runSeconds=secsRemaining%60;
+  sprintf(
+    currMsg, "R%03d:%02d:%02d,%02d,%03d;",
+    runHours, runMinutes, runSeconds, accelX, accelY
+  );
+}
+
 void setup() {
   // put your setup code here, to run once:
   goTime = millis();
@@ -107,9 +121,12 @@ void loop() {
   if (millis() >= goTime){
     blinkLED();
     updateXY(&accelX, &accelY);
+    getMsg();
     Serial.print(accelX);
     Serial.print(' ');
-    Serial.println(accelY);
+    Serial.print(accelY);
+    Serial.print(' ');
+    Serial.println(currMsg);
     updateDisplay(accelX, accelY);
   } 
 }
