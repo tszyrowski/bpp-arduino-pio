@@ -1,21 +1,23 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
 {
     "configurations": [
         {
-            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
-        },
-        {
-            "name": "Win32",
+            "name": "PlatformIO",
             "includePath": [
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/include",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/ArduinoBLE/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/Arduino_LSM9DS1/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/U8g2/src",
+                "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Wire",
+                "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/SPI",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/cores/arduino",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/cores/arduino/api/deprecated",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/variants/ARDUINO_NANO33BLE",
-                "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/SPI",
-                "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Wire",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Himax_HM01B0",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/KernelDebug/src",
                 "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/MRI/src",
@@ -50,11 +52,11 @@
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/ArduinoBLE/src",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/Arduino_LSM9DS1/src",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/U8g2/src",
+                    "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Wire",
+                    "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/SPI",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/cores/arduino",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/cores/arduino/api/deprecated",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/variants/ARDUINO_NANO33BLE",
-                    "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/SPI",
-                    "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Wire",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/Himax_HM01B0",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/KernelDebug/src",
                     "C:/Users/tszyr/.platformio/packages/framework-arduino-nrf52-mbedos/libraries/MRI/src",
@@ -83,7 +85,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50003",
+                "PLATFORMIO=50004",
                 "ARDUINO_ARDUINO_NANO33BLE",
                 "ARDUINO_ARCH_NRF52840",
                 "ARM_MATH_CM4",
@@ -156,7 +158,6 @@
                 "ARDUINO_ARCH_MBED",
                 ""
             ],
-            "intelliSenseMode": "gcc-x64",
             "cStandard": "c11",
             "cppStandard": "c++14",
             "compilerPath": "C:/Users/tszyr/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc.exe",
