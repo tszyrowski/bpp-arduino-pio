@@ -3,6 +3,7 @@
 #include <U8g2lib.h>
 #include <Arduino_LSM9DS1.h>
 
+#define BUFF_LENGTH 60        // Number of messages stored in queue
 #define MSG_LEENGTH 20        // length of the string consttructed for BLE
 #define REPORTING_PERIOD 1000 // how often values are reported
 
@@ -11,9 +12,12 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 int accelX = 1;
 int accelY = 1;
 float x, y ,z;
-char currMsg[MSG_LEENGTH];  // array to store data line
+char currMsg[MSG_LEENGTH + 1];  // array to store data line (and \0 string char)
 bool displayInitialised = false;
+char ringBuffer[BUFF_LENGTH][MSG_LEENGTH];
+int buffCurrIdx = 0;
 
+int msgSendIdx = 0;  // Index of last message send from ring buffer
 // scheduler
 long unsigned int goTime;
 // LED state
@@ -66,12 +70,12 @@ void blinkLED() {
   goTime = millis() + REPORTING_PERIOD;
   if (ledState) {
     digitalWrite(LED_BUILTIN, HIGH);
-    Serial.print("Works all ok the LED is ON ");
-    Serial.println(millis());
+    // Serial.print("Works all ok the LED is ON ");
+    // Serial.println(millis());
   } else {
     digitalWrite(LED_BUILTIN, LOW);
-    Serial.print("The LED is OFF ");
-    Serial.println(millis());
+    // Serial.print("The LED is OFF ");
+    // Serial.println(millis());
   }
   ledState = !ledState;
 }
@@ -101,28 +105,82 @@ void getMsg() {
   );
 }
 
+void arrayReplace(char* pBuffIdx, char* newMsg, int msgLenght){
+  for(int i=0; i < msgLenght; i++){
+    pBuffIdx[i] = newMsg[i];
+    // *(pBuffIdx + i) = *(newMsg + i);
+  }
+}
+
+void msgConsumer(){
+  char sendMSg[MSG_LEENGTH+1];
+  int i = 0;
+  if (Serial){                          // if consumer is ready
+    Serial.printf(
+      "enetered consumer i is %d msgSendIdx is %d buffCurrIdx is %d\n",
+      i, msgSendIdx, buffCurrIdx
+    );
+    while (msgSendIdx != buffCurrIdx){  // the producer idx in front of consumer
+      arrayReplace(                     // get the message to be send
+        sendMSg, ringBuffer[msgSendIdx], MSG_LEENGTH
+      );
+      sendMSg[MSG_LEENGTH] = '\0';      // make it a string
+      Serial.printf("## %d: %s\n", i, sendMSg);  // consume message
+      msgSendIdx++;                     // update mesg idx to the next slot
+      if (msgSendIdx == BUFF_LENGTH){   // if idx get to the end of buffer 
+        msgSendIdx = 0;                 // start from 1st to catch up
+      }
+      i++;
+    }
+  }
+}
+
 void setup() {
-  // put your setup code here, to run once:
   goTime = millis();
   Serial.begin(9200);
-  while(!Serial);  // wait with everything for serial
+  while(!Serial);                       // wait with everything for serial
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Now is in setup ");
-
   IMU.begin();
-
   u8g2.begin();
   initialDisplay();
   Serial.println("Dispaly should be initialised !!!");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   if (millis() >= goTime){
+    Serial.printf(
+      "** start loop: msgSendIdx is %d buffCurrIdx is %d\n",
+      msgSendIdx, buffCurrIdx
+    );
     blinkLED();
-    updateXY(&accelX, &accelY);
-    getMsg();
-    Serial.printf("%d %d %s\n", accelX, accelY, currMsg);
+    updateXY(&accelX, &accelY);  // new valules are read
     updateDisplay(accelX, accelY);
+
+    getMsg();                          // the message is updated
+    // add message to buffer
+    arrayReplace(ringBuffer[buffCurrIdx], currMsg, MSG_LEENGTH);
+    buffCurrIdx++;                    // Update buffer index to next slot
+    if (buffCurrIdx == BUFF_LENGTH){  // if index excceds the buffer length
+      buffCurrIdx = 0;                // get index back to front of quees
+    }
+    Serial.printf(
+      "--- In loop: msgSendIdx is %d buffCurrIdx is %d\n",
+      msgSendIdx, buffCurrIdx
+    );
+    // CONSUME MESSAGE
+    msgConsumer();
+    // Move consumer index by one forward so there are always last BUFF_LENGTH
+    // samples available.
+    if (buffCurrIdx == msgSendIdx - 1){  // if all messages are consumed
+      msgSendIdx++;                      // update the consimer index
+      if (msgSendIdx == BUFF_LENGTH){    // if get to the end of buffer
+        msgSendIdx = 0;                  // move index to the buff begining
+      }
+    }
+    Serial.printf(
+      "++ END loop: msgSendIdx is %d buffCurrIdx is %d\n",
+      msgSendIdx, buffCurrIdx
+    );
   }
 }
