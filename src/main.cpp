@@ -7,6 +7,13 @@
 #define MSG_LEENGTH 20        // length of the string consttructed for BLE
 #define REPORTING_PERIOD 1000 // how often values are reported
 
+/* Device name which can be scene in BLE scanning software. */
+#define BLE_DEVICE_NAME "Arduino Nano 33 BLE OXY"
+/* Local name which should pop up when scanning for BLE devices. */
+#define BLE_LOCAL_NAME "bpp-oxy"
+
+BLEDevice central;
+
 U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 
 int accelX = 1;
@@ -23,8 +30,10 @@ long unsigned int goTime;
 // LED state
 bool ledState = true;
 
-BLEService accelerometerService("1101");
-BLECharacteristic xyMsg("2101", BLERead | BLENotify, MSG_LEENGTH);
+BLEService customService("1101");
+BLECharacteristic bleMsg("2101", BLERead | BLENotify, MSG_LEENGTH);
+// create service
+
 
 void initialDisplay() {
   if (not displayInitialised){
@@ -135,6 +144,29 @@ void msgConsumer(){
   }
 }
 
+void send_reading() {
+  central = BLE.central();        // listen for BLE peripherals to connect:
+  char sendMSg[MSG_LEENGTH+1];
+  int i = 0;
+  if (central) {                     // if a central is connected to peripheral:
+// check the data every 200ms  as long as the central is still connected:the producer idx in front of consumer
+    while (central.connected() && (msgSendIdx != buffCurrIdx)){  // 
+      arrayReplace(                     // get the message to be send
+        sendMSg, ringBuffer[msgSendIdx], MSG_LEENGTH
+      );
+      sendMSg[MSG_LEENGTH] = '\0';      // make it a string
+      Serial.printf("## %d: %s\n", i, sendMSg);  // consume message
+      // Send data over bluetooth
+      bleMsg.setValue((unsigned char *)sendMSg,20);
+      msgSendIdx++;                     // update mesg idx to the next slot
+      if (msgSendIdx == BUFF_LENGTH){   // if idx get to the end of buffer 
+        msgSendIdx = 0;                 // start from 1st to catch up
+      }
+      i++;
+    }
+  }
+}
+
 void setup() {
   goTime = millis();
   Serial.begin(9200);
@@ -145,9 +177,36 @@ void setup() {
   u8g2.begin();
   initialDisplay();
   Serial.println("Dispaly should be initialised !!!");
+
+  // INITIALISE BLE
+  if (!BLE.begin()) {
+    Serial.println("BLE failed to Initiate");
+    while (1);
+  }
+
+  String address = BLE.address();
+  Serial.print("Local address is: ");
+  Serial.println(address);                    // display local addres
+
+  BLE.setDeviceName(BLE_DEVICE_NAME);
+  BLE.setLocalName(BLE_LOCAL_NAME);
+  // set the UUID for the service this peripheral advertises: 
+  BLE.setAdvertisedService(customService);
+  customService.addCharacteristic(bleMsg);
+  BLE.addService(customService);
+  char firstRead[] = {"xxxxxxxxxxxxxxxxxxxx"};
+  bleMsg.setValue((unsigned char *)firstRead,21);
+  /* Start advertising BLE.  It will start continuously transmitting BLE
+     advertising packets and will be visible to remote BLE central devices
+     until it receives a new connection */
+  BLE.advertise();
+  
+  Serial.println("Bluetooth device is now active, waiting for connections...");
 }
 
 void loop() {
+  // need to update HR and Oxy readings
+  // pox.update();
   if (millis() >= goTime){
     Serial.printf(
       "** start loop: msgSendIdx is %d buffCurrIdx is %d\n",
