@@ -12,7 +12,7 @@
 /* Local name which should pop up when scanning for BLE devices. */
 #define BLE_LOCAL_NAME "bpp-oxy"
 
-BLEDevice central;
+// BLEDevice central;
 
 U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 
@@ -145,18 +145,22 @@ void msgConsumer(){
 }
 
 void send_reading() {
-  central = BLE.central();        // listen for BLE peripherals to connect:
+  // BLEDevice central = BLE.central();        // listen for BLE peripherals to connect:
   char sendMSg[MSG_LEENGTH+1];
   int i = 0;
-  if (central) {                     // if a central is connected to peripheral:
+  // if (central) {                     // if a central is connected to peripheral:
 // check the data every 200ms  as long as the central is still connected:the producer idx in front of consumer
-    while (central.connected() && (msgSendIdx != buffCurrIdx)){  // 
+    // Serial.printf(" *** %s *** ", central.address());
+    while (BLE.central() && (msgSendIdx != buffCurrIdx)){  // 
+    // char mockMsg[20] = {"HELLO world from pi"};
+      Serial.println("GOt central ****");
       arrayReplace(                     // get the message to be send
         sendMSg, ringBuffer[msgSendIdx], MSG_LEENGTH
       );
       sendMSg[MSG_LEENGTH] = '\0';      // make it a string
       Serial.printf("## %d: %s\n", i, sendMSg);  // consume message
       // Send data over bluetooth
+      // bleMsg.setValue((unsigned char *)mockMsg,20);
       bleMsg.setValue((unsigned char *)sendMSg,20);
       msgSendIdx++;                     // update mesg idx to the next slot
       if (msgSendIdx == BUFF_LENGTH){   // if idx get to the end of buffer 
@@ -164,7 +168,7 @@ void send_reading() {
       }
       i++;
     }
-  }
+  // }
 }
 
 void setup() {
@@ -195,18 +199,21 @@ void setup() {
   customService.addCharacteristic(bleMsg);
   BLE.addService(customService);
   char firstRead[] = {"xxxxxxxxxxxxxxxxxxxx"};
-  bleMsg.setValue((unsigned char *)firstRead,21);
+
   /* Start advertising BLE.  It will start continuously transmitting BLE
      advertising packets and will be visible to remote BLE central devices
      until it receives a new connection */
+  bleMsg.setValue((unsigned char *)firstRead,21);
   BLE.advertise();
-  
+
   Serial.println("Bluetooth device is now active, waiting for connections...");
 }
 
 void loop() {
   // need to update HR and Oxy readings
   // pox.update();
+  BLEDevice central = BLE.central();
+
   if (millis() >= goTime){
     Serial.printf(
       "** start loop: msgSendIdx is %d buffCurrIdx is %d\n",
@@ -228,7 +235,9 @@ void loop() {
       msgSendIdx, buffCurrIdx
     );
     // CONSUME MESSAGE
-    msgConsumer();
+    // msgConsumer();
+    send_reading();
+
     // Move consumer index by one forward so there are always last BUFF_LENGTH
     // samples available.
     if (buffCurrIdx == msgSendIdx - 1){  // if all messages are consumed
