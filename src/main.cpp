@@ -12,7 +12,7 @@
 /* Local name which should pop up when scanning for BLE devices. */
 #define BLE_LOCAL_NAME "bpp-oxy"
 
-// BLEDevice central;
+BLEDevice central;
 
 U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 
@@ -151,7 +151,7 @@ void send_reading() {
   // if (central) {                     // if a central is connected to peripheral:
 // check the data every 200ms  as long as the central is still connected:the producer idx in front of consumer
     // Serial.printf(" *** %s *** ", central.address());
-    while (BLE.central() && (msgSendIdx != buffCurrIdx)){  // 
+    while (central.connected() && (msgSendIdx != buffCurrIdx)){  // 
     // char mockMsg[20] = {"HELLO world from pi"};
       Serial.println("GOt central ****");
       arrayReplace(                     // get the message to be send
@@ -174,7 +174,7 @@ void send_reading() {
 void setup() {
   goTime = millis();
   Serial.begin(9200);
-  while(!Serial);                       // wait with everything for serial
+  // while(!Serial);                       // wait with everything for serial
   digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("Now is in setup ");
   IMU.begin();
@@ -212,8 +212,7 @@ void setup() {
 void loop() {
   // need to update HR and Oxy readings
   // pox.update();
-  BLEDevice central = BLE.central();
-
+  central = BLE.central();
   if (millis() >= goTime){
     Serial.printf(
       "** start loop: msgSendIdx is %d buffCurrIdx is %d\n",
