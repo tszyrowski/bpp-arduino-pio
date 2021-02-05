@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/include",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/src",
+                "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/MAX30100lib/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/ArduinoBLE/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/Arduino_LSM9DS1/src",
                 "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/U8g2/src",
@@ -49,6 +50,7 @@
                 "path": [
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/include",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/src",
+                    "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/MAX30100lib/src",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/ArduinoBLE/src",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/Arduino_LSM9DS1/src",
                     "c:/Users/tszyr/bpp_workspace/arduino-imu-pio/.pio/libdeps/nanoatmega328/U8g2/src",
@@ -85,7 +87,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=50004",
+                "PLATFORMIO=50100",
                 "ARDUINO_ARDUINO_NANO33BLE",
                 "ARDUINO_ARCH_NRF52840",
                 "ARM_MATH_CM4",
