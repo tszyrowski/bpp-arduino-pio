@@ -50,3 +50,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+.pio/build/nanoatmega328/sizedata.json
+.pio/build/nanoatmega328/firmware.bin
+.pio/build/nanoatmega328/.sconsign37.dblite
